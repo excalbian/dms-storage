@@ -1,0 +1,9 @@
+flask
+flask-sqlalchemy
+flask-migrate
+flask-script
+flask-restful
+flask-marshmallow
+marshmallow-sqlalchemy
+mysql-connector-python
+python-dotenv
