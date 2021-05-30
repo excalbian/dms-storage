@@ -1,28 +1,20 @@
-from sqlalchemy import DateTime
-from .storage_type import StorageType, StorageTypeSchema
 from datetime import datetime
-from app.appdef import db, app
-from flask_marshmallow import Marshmallow
+from app.database import Base
+from sqlalchemy import Column, Integer, ForeignKey, String, DateTime
+from .storage_type import StorageType
+from sqlalchemy.orm import relationship, Session
+from pydantic import BaseModel
 
-ma = Marshmallow(app)
 
-class StorageSlot(db.Model):
+
+class StorageSlot(Base):
     """ Storage Slot DB Model
         Represents a single reserveable place for storage.
     """
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), nullable=False)
-    storage_type_id = db.Column(db.Integer, db.ForeignKey('storage_type.id'))
-    created_at = db.Column(DateTime, default=datetime.now)
-    updated_at = db.Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    storage_type = db.relationship(StorageType.__name__)
-
-class StorageSlotSchema(ma.SQLAlchemySchema):
-    class Meta:
-        model = StorageSlot
-    
-    id = ma.auto_field(dump_only=True)
-    name = ma.auto_field()
-    storage_type = ma.Nested(StorageTypeSchema)
-    created_at = ma.auto_field(dump_only=True)
-    updated_at = ma.auto_field(dump_only=True)
+    __tablename__ = 'storage_slot'
+    id = Column(Integer, primary_key=True)
+    name = Column(String(30), nullable=False)
+    storage_type_id = Column(Integer, ForeignKey('storage_type.id'))
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    storage_type = relationship(StorageType.__name__)

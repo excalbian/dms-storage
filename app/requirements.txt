@@ -1,9 +1,8 @@
-flask
-flask-sqlalchemy
-flask-migrate
-flask-script
-flask-restful
-flask-marshmallow
-marshmallow-sqlalchemy
+sqlalchemy
+pydantic
+alembic
+fastapi
 mysql-connector-python
 python-dotenv
+uvicorn[standard]
+Authlib

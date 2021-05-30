@@ -1,11 +1,11 @@
 from datetime import datetime
-from app.appdef import db, app
-from flask_marshmallow import Marshmallow
-from .user import User, UserSchema
-
+from typing import Optional
+from .user import User
+from app.database import Base
+from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, Text, JSON
+from sqlalchemy.orm import relationship, Session
 import enum
-
-ma = Marshmallow(app)
+from . import PydanticBase
 
 class AuditType(str, enum.Enum):
     """ All types of actions logged in the audit table """
@@ -16,25 +16,67 @@ class AuditType(str, enum.Enum):
     reportrun = 'reportrun'
     slotupdated = 'slotupdated'
 
-class AuditLog(db.Model):
+class AuditLog(Base):
     """ Represents an audit entry in the database. Used for all
         actions that should be auditable """
-    id = db.Column(db.Integer, primary_key=True)
-    logtime = db.Column(db.DateTime, default=datetime.now)
-    type = db.Column(db.Enum(AuditType))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    message = db.Column(db.Text)
-    data = db.Column(db.JSON)
-    user = db.relationship(User.__name__)
+    __tablename__ = "auditlog"
+    id = Column(Integer, primary_key=True)
+    logtime = Column(DateTime, default=datetime.now)
+    type = Column(Enum(AuditType))
+    user_id = Column(Integer, ForeignKey('user.id'))
+    message = Column(Text)
+    data = Column(JSON)
+    user = relationship(User.__name__)
 
-class AuditLogSchema(ma.SQLAlchemySchema):
-    """ Used during JSON conversion of the database model object """
-    class Meta:
-        model = AuditLog
+
+class AuditLogBase(PydanticBase):
+    type: AuditType
+    message: str
+    data: Optional[str] = None
+    user: User
+
+class AuditLogCreate(AuditLogBase):
+    pass
+
+class AuditLogRead(AuditLogBase):
+    id: int
+    logtime: datetime
+
+    class Config:
+        orm_mode = True
+
+class Crud():
+    def __init__(self, db: Session):
+        self._db = db
+
+    def get_logs(self, date_from: datetime, date_to: datetime, skip: int = 0, limit: int = 5000):
+        q = self._db.query(AuditLog)
+        if( date_from is not None ):
+            q = q.filter(AuditLog.logtime >= date_from)
+        if( date_to is not None ):
+            q = q.filter(AuditLog.logtime <= date_to)
+        return q \
+            .order_by(AuditLog.logtime.desc()) \
+            .offset(skip) \
+            .limit(limit) \
+            .all()
+
+    def get_user_logs(self, user: User, skip: int = 0, limit: int = 5000):
+        return self._db.query(AuditLog) \
+            .filter( AuditLog.user_id == user.id ) \
+            .order_by(AuditLog.logtime.desc()) \
+            .offset(skip) \
+            .limit(limit) \
+            .all()
     
-    id = ma.auto_field(dump_only=True)
-    logtime = ma.auto_field(dump_only=True)
-    type = ma.auto_field()
-    message = ma.auto_field()
-    data = ma.auto_field()
-    user = ma.Nested(UserSchema, only=['id','username'] )
+    def create_log(self, obj: AuditLogCreate) -> AuditLog:
+        log = AuditLog( 
+            type = obj.type,
+            user_id = obj.user.id,
+            message = obj.message,
+            data = obj.data )
+        
+        self._db.add(log)
+        self._db.commit()
+        self._db.refresh(log)
+        return log

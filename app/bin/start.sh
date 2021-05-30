@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 cd /usr/src/app
-flask db upgrade
-flask run
+alembic upgrade head
+uvicorn --host 0.0.0.0 --log-level debug --app-dir .. app.main:app

@@ -1,7 +1,9 @@
 from datetime import datetime
-from app.appdef import db
+from app.database import Base
+from sqlalchemy import Column, Integer, Enum, String, DateTime
+from sqlalchemy.orm import relationship, Session
+from pydantic import BaseModel
 import enum
-
 
 class HookType(str, enum.Enum):
     """ Types of webhooks available """
@@ -11,13 +13,14 @@ class HookType(str, enum.Enum):
     slot_dead = 'slot_dead'
     user_banned = 'user_banned'
 
-class Webhook(db.Model):
+class Webhook(Base):
     """ Webhook DB Model
         Stores registered webhooks to fire when actions happen
     """
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.Enum(HookType), index=True)
-    url = db.Column(db.String(200))
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    __tablename__ = 'webhook'
+    id = Column(Integer, primary_key=True)
+    type = Column(Enum(HookType), index=True)
+    url = Column(String(200))
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     # TODO: Authentication / Key storage
