@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
-from app.database import Base
-from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, String, Text, JSON
+from app.database import Base, SessionLocal
+from sqlalchemy import Column, Boolean, Integer, DateTime, Enum, ForeignKey, String, Text, JSON
 from sqlalchemy.orm import relationship, Session
 from . import PydanticBase
 
@@ -18,6 +18,11 @@ class User(Base):
     phone = Column(String(20), nullable=True)
     email = Column(String(150), nullable=True)
     next_use = Column(DateTime, nullable=True)
+    is_banned = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)
+    can_report = Column(Boolean, default=False)
+    can_configure = Column(Boolean, default=False)
+    can_ban = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
@@ -29,6 +34,7 @@ class UserBase(PydanticBase):
     next_use: Optional[datetime] = None
     class Config:
         arbitrary_types_allowed = True
+        orm_mode = True
 
 class UserCreate(UserBase):
     class Config:

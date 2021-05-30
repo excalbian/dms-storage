@@ -2,7 +2,8 @@ from datetime import datetime
 from app.database import Base
 from sqlalchemy import Column, Integer, ForeignKey, Boolean, DateTime
 from sqlalchemy.orm import relationship, Session
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBase
+from typing import Optional
 
 class Permissions(Base):
     """ Permissions DB Model
@@ -13,9 +14,32 @@ class Permissions(Base):
     __tablename__ = 'permissions'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True, unique=True)
-    is_admin = Column(Boolean, default=False)
-    can_report = Column(Boolean, default=False)
-    can_configure = Column(Boolean, default=False)
-    can_ban = Column(Boolean, default=False)
+
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+class _PermissionBase(PydanticBase):
+    user_id: int
+    is_admin: bool
+    can_report: bool
+    can_configure: bool
+    can_ban: bool
+    can_access: bool = True
+    class Config:
+        arbitrary_types_allowed = True
+        orm_mode = True
+
+class PermissionCreate(_PermissionBase):
+    pass
+class PermissionsRead(_PermissionBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+class PermissionCrud():
+    def __init__(self, db:Session):
+        self._db = db
+    
+    def get_user_permissions(self, user_id: int):
+        return self._db.query(Permissions) \
+            .filter(Permissions.user_id==user_id) \
+            .first()
