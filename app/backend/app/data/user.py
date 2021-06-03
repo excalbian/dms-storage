@@ -51,8 +51,8 @@ class UserAccess():
         self._session = sm
     
     def get_users(self, skip: int = 0, limit: int = 5000) -> List[User]:
-        with self._session as db:
-            users:List[DbUser] = self._db.query(DbUser) \
+        with self._session() as db:
+            users:List[DbUser] = db.query(DbUser) \
                 .order_by(DbUser.username) \
                 .offset(skip) \
                 .limit(limit) \
@@ -86,7 +86,8 @@ class UserAccess():
     
     def update_user(self, obj: User) -> User:
         with self._session() as db:
-            u = db.query(DbUser).get(obj.id).update(
+            u = db.query(DbUser).filter(DbUser.id == obj.id) \
+            .update(
             {
                 DbUser.email: obj.email,
                 DbUser.displayname: obj.displayname,
@@ -99,7 +100,9 @@ class UserAccess():
                 DbUser.can_configure: obj.can_configure,
                 DbUser.can_ban: obj.can_ban  
             })
+            if u <= 0:
+                raise KeyError("User with id {obj.id} not found")
             db.commit()
-            db.refresh(u)
-            return User.from_orm(u)
+            updated = db.query(DbUser).get(obj.id)
+            return User.from_orm(updated)
     

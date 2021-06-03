@@ -19,7 +19,7 @@ class DbConfiguration(DbBase):
     value = Column(Text)
 
 # basic crud
-class AuditLogAccess():
+class ConfigurationAccess():
     def __init__(self, sm:sessionmaker):
         self._session = sm
     
@@ -47,10 +47,11 @@ class AuditLogAccess():
 
     def update(self, key: str, value: str) -> None:
         with self._session() as db:
-            c = db.query(DbConfiguration).filter(DbConfiguration.key == key).first()
-            if c is None:
+            c = db.query(DbConfiguration) \
+                .filter(DbConfiguration.key == key) \
+                .update({DbConfiguration.value:value})
+            if c <= 0:
                 raise KeyError("{key} not found")
-            c.update({DbConfiguration.value:value})
             db.commit()
 
 

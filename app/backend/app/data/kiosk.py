@@ -25,12 +25,12 @@ class DbKiosk(DbBase):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 class Kiosk(PydanticBase):
-    id: int = Field(allow_mutation=False)
+    id: int = Field(allow_mutation=False, default=-1)
     name: str
-    printer_name = Optional[str]
+    printer_name: Optional[str] = None
 
 # basic crud
-class AuditLogAccess():
+class KioskAccess():
     def __init__(self, sm:sessionmaker):
         self._session = sm
     
@@ -40,34 +40,39 @@ class AuditLogAccess():
             return [Kiosk.from_orm(k) for k in kiosks]
     
     def get_by_id(self, id: int) -> Kiosk:
-        c:DbKiosk = None
+        k:DbKiosk = None
         with self._session() as db:
             k = db.query(DbKiosk).get(id)
-        return None if c is None else Kiosk.from_orm(k)
+        return None if k is None else Kiosk.from_orm(k)
 
     def get_by_name(self, name: str) -> Kiosk:
-        c:DbKiosk = None
+        k:DbKiosk = None
         with self._session() as db:
             k = db.query(DbKiosk).filter(DbKiosk.name == name).first()
-        return None if c is None else Kiosk.from_orm(k)
+        return None if k is None else Kiosk.from_orm(k)
 
-    def create(self, obj: Kiosk) -> None:
+    def create(self, obj: Kiosk) -> Kiosk:
         with self._session() as db:
-            k = DbKiosk(**obj.dict())
+            k = DbKiosk(
+                name = obj.name,
+                printer_name = obj.printer_name
+            )
             db.add(k)
             db.commit()
-            return
+            db.refresh(k)
+            return Kiosk.from_orm(k)
 
-    def update(self, obj:Kiosk) -> None:
+    def update(self, obj:Kiosk) -> Kiosk:
         with self._session() as db:
-            k = db.query(DbKiosk).get(obj.id)
-            if k is None:
+            k = db.query(DbKiosk) \
+                .filter(DbKiosk.id == obj.id) \
+                .update({
+                    DbKiosk.name: obj.name,
+                    DbKiosk.printer_name: obj.printer_name
+                })
+            if k <= 0:
                 raise KeyError("Kiosk id {id} not found")
-            k.update({
-                DbKiosk.name: obj.name,
-                DbKiosk.printer_name: obj.printer_name
-            })
-            db.commit()
+            return Kiosk.from_orm( db.query(DbKiosk).get(obj.id) )
 
     def delete(self, obj:Kiosk) -> None:
         with self._session() as db:
