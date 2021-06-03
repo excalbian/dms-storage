@@ -8,3 +8,5 @@ uvicorn[standard]
 itsdangerous 
 Authlib
 httpx
+requests
+google-auth

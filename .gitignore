@@ -3,3 +3,5 @@
 .logs
 __pycache__
 .env
+id_rsa*
+.pytest*

@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: 0b08ebafca40
+Revision ID: ccb6eb89a8f3
 Revises: 
-Create Date: 2021-05-27 19:53:46.378034
+Create Date: 2021-05-30 22:44:44.597615
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0b08ebafca40'
+revision = 'ccb6eb89a8f3'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -51,6 +51,12 @@ def upgrade():
     sa.Column('next_use', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('is_banned', sa.Boolean(), nullable=True),
+    sa.Column('is_admin', sa.Boolean(), nullable=True),
+    sa.Column('can_report', sa.Boolean(), nullable=True),
+    sa.Column('can_configure', sa.Boolean(), nullable=True),
+    sa.Column('can_ban', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_username'), 'user', ['username'], unique=True)
@@ -73,19 +79,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('permissions',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('is_admin', sa.Boolean(), nullable=True),
-    sa.Column('can_report', sa.Boolean(), nullable=True),
-    sa.Column('can_configure', sa.Boolean(), nullable=True),
-    sa.Column('can_ban', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_index(op.f('ix_permissions_user_id'), 'permissions', ['user_id'], unique=True)
     op.create_table('storage_slot',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=30), nullable=False),
@@ -118,8 +111,6 @@ def downgrade():
     op.drop_index(op.f('ix_storage_expiring'), table_name='storage')
     op.drop_table('storage')
     op.drop_table('storage_slot')
-    op.drop_index(op.f('ix_permissions_user_id'), table_name='permissions')
-    op.drop_table('permissions')
     op.drop_table('auditlog')
     op.drop_index(op.f('ix_webhook_type'), table_name='webhook')
     op.drop_table('webhook')
