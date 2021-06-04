@@ -5,5 +5,5 @@ __pycache__
 .env
 id_rsa*
 .pytest*
-.coverage
-converage.xml
+*.coverage
+coverage.xml
