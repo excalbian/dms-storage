@@ -181,3 +181,34 @@ def test_get_all_active(session):
 
     assert len(results) == 75
     assert all(s.status != storage.StorageStatus.closed for s in results)
+
+def test_update(session):
+    testtype = _type(session)
+    testslot = _slot(session,testtype)
+    testuser = _user(session)
+
+    storageaccess = storage.StorageAccess(session)
+    s = storage.Storage(
+        user = testuser,
+        slot = testslot 
+    )
+    created = storageaccess.create_storage(s)
+    created.status = storage.StorageStatus.closed
+    updated = storageaccess.update(created)
+
+    assert created == updated
+    assert updated != s
+    assert updated.id == 1
+
+def test_bad_update(session):
+    testtype = _type(session)
+    testslot = _slot(session,testtype)
+    testuser = _user(session)
+
+    storageaccess = storage.StorageAccess(session)
+    s = storage.Storage(
+        user = testuser,
+        slot = testslot 
+    )
+    with pytest.raises(KeyError):
+        updated = storageaccess.update(s)

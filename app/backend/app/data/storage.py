@@ -114,14 +114,14 @@ class StorageAccess():
         with self._session() as db:
             rows = db.query(DbStorage) \
                 .filter(DbStorage.id == storage.id) \
-                .update(
-                    started = storage.started,
-                    expiring = storage.expiring,
-                    ended = storage.ended,
-                    status = storage.status  
-                )
+                .update({
+                    DbStorage.started: storage.started,
+                    DbStorage.expiring: storage.expiring,
+                    DbStorage.ended: storage.ended,
+                    DbStorage.status: storage.status  
+                })
             db.commit()
-            if rows < 0:
+            if rows <= 0:
                 raise KeyError("Couldn't find storage with id {storage.id}")
             
             return Storage.from_orm( db.query(DbStorage).get(storage.id))
