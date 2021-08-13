@@ -8,6 +8,7 @@ services:
         - ./app/backend:/usr/src/app
         depends_on:
         - "db"
+        - "openldap"
         networks:
             main:
                 aliases:
@@ -44,6 +45,8 @@ services:
             main:
                 aliases:
                     - ui
+        links:
+        - api
         depends_on: 
         - "api"
     openldap:
@@ -64,11 +67,10 @@ services:
             main:
                 aliases:
                     - phpldapadmin
-        depends_on: 
+        links:
         - openldap
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
-        container_name: pma
         links:
         - db
         environment:
@@ -78,5 +80,9 @@ services:
         restart: always
         ports:
         - 8081:80
+        networks:
+            main:
+                aliases:
+                    - phpmyadmin
 networks:
     main:
