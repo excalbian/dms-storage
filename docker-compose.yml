@@ -31,6 +31,26 @@ services:
             main:
                 aliases:
                     - db
+    openldap:
+        extends:
+            file: ./dms-ad-openldap/docker-compose.yml
+            service: openldap
+            #container_name: openldap
+        networks:
+            main:
+                aliases:
+                    - openldap
+    phpldapadmin:
+        extends:
+            file: ./dms-ad-openldap/docker-compose.yml
+            service: phpldapadmin
+            #container_name: phpldapadmin
+        networks:
+            main:
+                aliases:
+                    - phpldapadmin
+        depends_on: 
+        - openldap
 
 volumes:
     web-data:
