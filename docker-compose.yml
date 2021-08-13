@@ -4,8 +4,8 @@ services:
         build: app/backend/.
         ports:
         - "8080:8000"
-        #volumes:
-        #- ./app:/usr/src/app
+        volumes:
+        - ./app/backend:/usr/src/app
         depends_on:
         - "db"
         networks:
@@ -31,6 +31,21 @@ services:
             main:
                 aliases:
                     - db
+    frontend:
+        hostname: ui
+        build: app/frontend/.
+        volumes:
+        - ./app/frontend:/usr/src/app
+        ports:
+        - 4200:4200
+        command: >
+            bash -c "npm install && ng serve --host 0.0.0.0 --port 4200 --poll 500"
+        networks:
+            main:
+                aliases:
+                    - ui
+        depends_on: 
+        - "api"
     openldap:
         extends:
             file: ./dms-ad-openldap/docker-compose.yml
@@ -51,8 +66,17 @@ services:
                     - phpldapadmin
         depends_on: 
         - openldap
-
-volumes:
-    web-data:
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: pma
+        links:
+        - db
+        environment:
+            PMA_HOST: db
+            PMA_PORT: 3306
+            PMA_ARBITRARY: 1
+        restart: always
+        ports:
+        - 8081:80
 networks:
     main:
