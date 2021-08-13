@@ -1,27 +1,24 @@
 from fastapi import Depends, HTTPException, status
 from typing import Generator
 from fastapi.security.oauth2 import OAuth2PasswordBearer
+from app.api.api_v1.endpoints.auth import router
 
 from sqlalchemy.orm.session import sessionmaker
-from app.backend.app.core.database import get_db
-from app.backend.app.data.user import User
+from app.core.database import get_db
+from app.data.user import User
+from app.core.security import get_user_from_token
 from authlib.jose import jwt
 from .token import Token 
 
-reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"login"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth")
 
 def get_current_user(
-    db: sessionmaker = Depends(get_db), 
-    token: str = Depends(reusable_oauth2)
+    token: str = Depends(oauth2_scheme)
 ) -> User:
     try:
-        payload = jwt.decode(token, read_file('./app/jwtRS256.key.pub'))
-        token_data = Token.parse_obj(payload)
+        user = get_user_from_token(token)
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(ex))
-    user = token_data
     if not user or not user.id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     return user

@@ -10,3 +10,5 @@ Authlib
 httpx
 requests
 google-auth
+ldap3
+python-multipart

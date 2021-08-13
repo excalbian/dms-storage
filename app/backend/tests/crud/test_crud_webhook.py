@@ -1,5 +1,5 @@
 
-import app.backend.app.data.webhook as webhook
+import app.data.webhook as webhook
 from .fixtures import *
 from app.tests.utils.randoms import random_string
 

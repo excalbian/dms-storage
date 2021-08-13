@@ -1,7 +1,7 @@
 
 from os import name
-import app.backend.app.data.storage_type as storagetype
-import app.backend.app.data.storage_slot as storageslot
+import app.data.storage_type as storagetype
+import app.data.storage_slot as storageslot
 from .fixtures import *
 from app.tests.utils.randoms import random_string
 

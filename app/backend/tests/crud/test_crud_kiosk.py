@@ -1,5 +1,5 @@
 
-import app.backend.app.data.kiosk as kiosk
+import app.data.kiosk as kiosk
 from .fixtures import *
 from app.tests.utils.randoms import random_string
 

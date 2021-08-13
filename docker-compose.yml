@@ -1,11 +1,11 @@
 version: '3'
 services: 
     api:
-        build: app/.
+        build: app/backend/.
         ports:
         - "8080:8000"
-        volumes:
-        - ./app:/usr/src/app
+        #volumes:
+        #- ./app:/usr/src/app
         depends_on:
         - "db"
         networks:
@@ -24,9 +24,9 @@ services:
             MYSQL_PASSWORD: 'password'
         volumes:
             - ./.data:/var/lib/mysql
-            - SYS_NICE  # CAP_SYS_NICE
+            #- SYS_NICE  # CAP_SYS_NICE
         ports:
-        - "3306:3306"
+        - "6666:3306"
         networks:
             main:
                 aliases:

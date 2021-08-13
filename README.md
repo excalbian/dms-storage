@@ -19,3 +19,18 @@ openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
 cat jwtRS256.key
 cat jwtRS256.key.pub
 
+
+# UI functionality TODO
+- Login
+- View Current storages
+- View Past Storage
+- Admin View
+- View all current storage
+- View all storage of user
+- View all previous storage
+- View all expired storage
+- Mark storage to close
+- Close storage
+- Ban user
+- Unban user
+- 

@@ -12,6 +12,6 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def get_db() -> Generator[sessionmaker, None, None]:
     try:
         db = SessionLocal()
-        yield db
+        yield SessionLocal
     finally:
         db.close()

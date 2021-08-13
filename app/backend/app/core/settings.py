@@ -1,7 +1,7 @@
 import os
-from typing import  List, Optional, Union
+from typing import  List, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, validator, SecretStr
+from pydantic import AnyHttpUrl, BaseSettings, validator
 from pydantic.types import FilePath
 import secrets
 
@@ -13,7 +13,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
-    GOOGLE_CLIENT_ID: str = ""
+    AD_URL: str = "ad.dallasmakerspace.org"
+    AD_UPN: str = "@dms.local"
     JWT_RSA_PRIV: FilePath = basedir + "/../jwtRS256.key"
     JWT_RSA_PUB: FilePath = basedir + "/../jwtRS256.key.pub"
 
@@ -26,7 +27,7 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    DATABASE_URL: str = "sqlite://"
+    DATABASE_URL: str = "sqlite:///" + os.path.join(basedir, '../../../../.data/app.db')
 
     DEV_BYPASSAUTH_ONLYADMIN: bool = False
 
@@ -34,4 +35,4 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 
-settings = Settings( basedir + "/.env")
+settings = Settings( basedir + "../.env")

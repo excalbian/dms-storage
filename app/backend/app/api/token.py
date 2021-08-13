@@ -1,4 +1,4 @@
-from app.backend.app.data.user import User
+from app.data.user import User
 from typing import Optional
 
 class Token(User):

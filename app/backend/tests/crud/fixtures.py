@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.orm import sessionmaker
-import app.backend.app.data.user as user
-from app.backend.app.data import DbBase
+import app.data.user as user
+from app.data import DbBase
 import pytest
 import datetime
 

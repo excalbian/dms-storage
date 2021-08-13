@@ -1,5 +1,5 @@
 
-import app.backend.app.data.configuration as configuration
+import app.data.configuration as configuration
 import datetime
 from .fixtures import *
 from app.tests.utils.randoms import random_string

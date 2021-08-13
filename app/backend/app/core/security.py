@@ -1,14 +1,24 @@
+from enum import Enum
 from typing import Union, Any
-from app.backend.app.data.user import User
+from app.data.user import User
 from datetime import timedelta, datetime
-from app.backend.app.core.settings import settings
+from app.core.settings import settings
 from authlib.jose import jwt
+
+from ldap3 import Server, Connection
+
+class NotAuthorizedException(Exception):
+    pass
+
 def read_file(filename):
   fh = open(filename, "r")
   try:
       return fh.read()
   finally:
       fh.close()
+
+__key = read_file(settings.JWT_RSA_PRIV)
+__pub = read_file(settings.JWT_RSA_PUB)
 
 def create_access_token(
     subject: Union[str, Any], 
@@ -27,11 +37,30 @@ def create_access_token(
         "exp": expire, 
         "sub": str(subject)}
     to_encode.update(dict(user))
-    key = read_file('./app/jwtRS256.key')
-    encoded_jwt = jwt.encode(header, to_encode, key)
+    encoded_jwt = jwt.encode(header, to_encode, __key)
     return encoded_jwt
 
 def get_user_from_token(token: str) -> User:
-    payload = jwt.decode(token, read_file('./app/jwtRS256.key.pub'))
+    payload = jwt.decode(token, __pub )
     token_data = User.parse_obj(payload)
     return token_data
+
+def ad_auth_user( username: str, password: str):
+    server = Server(settings.AD_URL)
+    conn = Connection(server,user=username + settings.AD_UPN,password=password)
+    try:
+        conn.bind()
+    except:
+        raise NotAuthorizedException()
+    
+    conn.search('dc=dms,dc=local', f'(userPrincipalName={username}{settings.AD_UPN})', attributes=['cn','mail','displayName'])
+    member = conn.entries
+
+    if len(member) == 0:
+        raise NotAuthorizedException()
+
+    return {
+        "username": username,
+        "name": member[0].displayName.value,
+        "email": member[0].mail.value
+    }

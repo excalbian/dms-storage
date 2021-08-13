@@ -1,72 +1,51 @@
-from typing import Any
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
-from google import oauth2
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
 
-from app.backend.app.api  import deps
-from app.backend.app.core.settings import settings
-from app.backend.app.data.user import UserAccess, User
-from app.backend.app.core.security import create_access_token
-from authlib.integrations.starlette_client import OAuth, OAuthError
-from google.oauth2 import id_token
-from google.auth.transport import requests
+from starlette.requests import Request
+
+from app.api  import deps
+from app.core.settings import settings
+from app.data.user import UserAccess, User
+from app.core.security import create_access_token, ad_auth_user
+from app.core.database import SessionLocal
+
 from datetime import timedelta
 
 router = APIRouter()
-oauth = OAuth()
-oauth.register(
-    name='google',
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_id = settings['GOOGLE_CLIENT_ID'],
-    client_secret = settings['GOOGLE_CLIENT_SECRET'],
-    client_kwargs={
-        'scope': 'openid email profile'
-    }
-)
 
 
-@router.get('/login', tags=['authentication'])
-async def login(request: Request):
-    redirect_uri = request.url_for('auth')
-    return await oauth2.google.authorize_redirect(
-        request, 
-        redirect_uri,
-        login_hint="skyspook@dallasmakerspace.org", 
-        hd='dallasmakerspace.org'
-    )
+@router.post('/auth')
+async def auth(
+    request: Request, 
+    form_data: OAuth2PasswordRequestForm = Depends()):
 
-
-
-@router.get('/auth')
-async def auth(request: Request, dbsession = Depends(deps.get_db)):
+    username = form_data.username
+    password = form_data.password
+    if not username or not password:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    user = None
     try:
-        if request.method == 'GET' and 'code' in request.query_params:
-            token = await oauth.google.authorize_access_token(request)
-            user = await oauth.google.parse_id_token(request, token)
-        elif request.method == 'POST':
-            user = id_token.verify_oauth2_token(
-                request.form['token'], 
-                requests.Request(), 
-                settings['GOOGLE_CLIENT_ID']
-            )
-        else:
-            return HTTPException(status.HTTP_403_FORBIDDEN)
+        user = ad_auth_user(username, password)
     except:
-        return HTTPException(status.HTTP_403_FORBIDDEN)
+         raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     
-    #user = await oauth.google.parse_id_token(request, token)
-    username = user['email'].split('@')[0]
-    user_access = UserAccess()
-    dbuser = user_access.get_user_by_username(username)
+   
+    user_access = UserAccess(SessionLocal)
+    dbuser = user_access.get_user_by_username(user['username'])
     if dbuser is None:
         newuser = User(
-            username=username, 
+            username = user['username'], 
             email = user['email'], 
             displayname = user['name'])
         dbuser = user_access.create_user(newuser)
-    access_token_expires = timedelta(minutes=int(settings['ACCESS_TOKEN_EXPIRE_MINUTES']))
+    access_token_expires = timedelta(minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     return {
         "access_token": create_access_token(
             dbuser.id,
@@ -76,8 +55,6 @@ async def auth(request: Request, dbsession = Depends(deps.get_db)):
         "token_type": "bearer",
     }
 
-@router.get('/logout', tags=['authentication'])  # Tag it as "authentication" for our docs
-async def logout(request: Request):
-    # Remove the user
-    request.session.pop('user', None)
-    return RedirectResponse(url='/')
+
+
+

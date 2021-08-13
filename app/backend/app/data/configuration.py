@@ -4,7 +4,7 @@ from sqlalchemy.orm.session import sessionmaker
 from . import DbBase
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship, Session
-from app.backend.app.core.database import get_db
+from app.core.database import get_db
 from . import PydanticBase
 from pydantic import Field
 from typing import Optional

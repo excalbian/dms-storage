@@ -1,5 +1,5 @@
 
-import app.backend.app.data.auditlog as auditlog
+import app.data.auditlog as auditlog
 import datetime
 from .fixtures import *
 from app.tests.utils.randoms import random_string

@@ -1,4 +1,4 @@
-import app.backend.app.data.user as user
+import app.data.user as user
 from .fixtures import *
 from app.tests.utils.randoms import random_date, random_string
 

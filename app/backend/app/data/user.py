@@ -3,7 +3,7 @@ from typing import Optional, List
 
 from sqlalchemy.orm.session import sessionmaker
 from . import DbBase
-from app.backend.app.core.database import get_db
+from app.core.database import get_db
 from sqlalchemy import Column, Boolean, Integer, DateTime, String
 from sqlalchemy.orm import relationship
 from . import PydanticBase

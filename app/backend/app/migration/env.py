@@ -4,8 +4,8 @@ sys.path = ['', '..'] + sys.path[1:]
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 import app
-from app.database import Base
-from app.models import *
+from app.data import DbBase
+from app.data import *
 from alembic import context
 import os
 basedir = os.path.abspath(os.path.dirname(app.__file__))
@@ -25,7 +25,7 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = DbBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

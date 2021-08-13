@@ -1,9 +1,9 @@
 
 from os import name
-import app.backend.app.data.storage_type as storagetype
-import app.backend.app.data.storage_slot as storageslot
-import app.backend.app.data.storage as storage
-import app.backend.app.data.user as user
+import app.data.storage_type as storagetype
+import app.data.storage_slot as storageslot
+import app.data.storage as storage
+import app.data.user as user
 from datetime import datetime, timedelta
 
 from .fixtures import *
