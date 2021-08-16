@@ -1,6 +1,7 @@
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi.logger import logger
 
 from starlette.requests import Request
 
@@ -11,9 +12,10 @@ from app.core.security import create_access_token, ad_auth_user
 from app.core.database import SessionLocal
 
 from datetime import timedelta
+#import logging
 
 router = APIRouter()
-
+#logger = logging.getLogger(__name__)
 
 @router.post('/auth')
 async def auth(
@@ -29,7 +31,9 @@ async def auth(
         )
     user = None
     try:
+        logger.debug(f'User logging in {username}')
         user = ad_auth_user(username, password)
+        logger.debug(f'Got user from AD: {username}, {user["name"]}, {user["email"]}')
     except:
          raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -45,6 +49,8 @@ async def auth(
             email = user['email'], 
             displayname = user['name'])
         dbuser = user_access.create_user(newuser)
+        logger.info(f'Created new database user {dbuser.id} for {username}')
+    logger.debug(f'User {username} logged in as {dbuser.id}')
     access_token_expires = timedelta(minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     return {
         "access_token": create_access_token(

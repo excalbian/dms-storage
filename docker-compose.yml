@@ -9,6 +9,11 @@ services:
         depends_on:
         - "db"
         - "openldap"
+        environment:
+            AD_URL: 'openldap'
+            AD_UN: 'cn=svcacct,ou=Applications,ou=Groups,dc=dms,dc=local'
+            AD_PW: 'password'
+            DATABASE_URL: 'mysql+mysqlconnector://user:password@db:3306/dms-storage'
         networks:
             main:
                 aliases:
@@ -39,12 +44,15 @@ services:
         - ./app/frontend:/usr/src/app
         ports:
         - 4200:4200
+        - 9222:9222
         command: >
-            bash -c "npm install && ng serve --host 0.0.0.0 --port 4200 --poll 500"
+            bash -c "npm install && ng serve --host 0.0.0.0 --port 4200 --watch --poll 500"
         networks:
             main:
                 aliases:
                     - ui
+        environment:
+            NODE_ENV: development
         links:
         - api
         depends_on: 
@@ -76,7 +84,9 @@ services:
         environment:
             PMA_HOST: db
             PMA_PORT: 3306
-            PMA_ARBITRARY: 1
+            PMA_ARBITRARY: 0
+            PMA_USER: root
+            PMA_PASSWORD: example
         restart: always
         ports:
         - 8081:80

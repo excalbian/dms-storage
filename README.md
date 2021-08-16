@@ -20,10 +20,12 @@ cat jwtRS256.key
 cat jwtRS256.key.pub
 
 
-# UI functionality TODO
-- Login
-- View Current storages
-- View Past Storage
+# UI / Endpoing functionality TODO
+- auth/Login
+- storage/Allocate new Storage
+- storage/allocate new w/ quiz
+- storage/View Current storages
+- storage/View Past Storage 
 - Admin View
 - View all current storage
 - View all storage of user
@@ -33,4 +35,6 @@ cat jwtRS256.key.pub
 - Close storage
 - Ban user
 - Unban user
+- kiosk/badge-in
+- kiosk/storage
 - 

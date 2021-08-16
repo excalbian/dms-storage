@@ -1,0 +1,4 @@
+<h2>Home</h2>
+<div *ngIf="currentUser!==null"><h1>Hi {{currentUser?.displayname}}!</h1></div>
+<div *ngIf="currentUser===null"><h1>Please Log in</h1><app-login></app-login></div>
+

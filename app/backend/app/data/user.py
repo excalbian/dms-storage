@@ -66,8 +66,7 @@ class UserAccess():
             dbuser = db.query(DbUser) \
                 .filter(DbUser.username == username) \
                 .first()
-            user = User.from_orm(dbuser)
-            return user
+            return None if dbuser is None else User.from_orm(dbuser)
     
     def create_user(self, obj: User) -> User:
         with self._session() as db:

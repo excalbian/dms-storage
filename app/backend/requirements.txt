@@ -12,3 +12,4 @@ requests
 google-auth
 ldap3
 python-multipart
+pyyaml

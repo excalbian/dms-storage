@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     AD_URL: str = "ad.dallasmakerspace.org"
     AD_UPN: str = "@dms.local"
+    AD_UN: str = "cn=svcacct,ou=Applications,ou=Groups,dc=dms,dc=local"
+    AD_PW: str = "password"
     JWT_RSA_PRIV: FilePath = basedir + "/../jwtRS256.key"
     JWT_RSA_PUB: FilePath = basedir + "/../jwtRS256.key.pub"
 

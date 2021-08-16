@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import Union, Any
 from app.data.user import User
 from datetime import timedelta, datetime
@@ -47,17 +46,27 @@ def get_user_from_token(token: str) -> User:
 
 def ad_auth_user( username: str, password: str):
     server = Server(settings.AD_URL)
-    conn = Connection(server,user=username + settings.AD_UPN,password=password)
+    upn = username + settings.AD_UPN
+    conn = Connection(server, user = settings.AD_UN, password = settings.AD_PW)
+
     try:
         conn.bind()
     except:
-        raise NotAuthorizedException()
-    
-    conn.search('dc=dms,dc=local', f'(userPrincipalName={username}{settings.AD_UPN})', attributes=['cn','mail','displayName'])
+        raise Exception("Internal server error")
+
+    conn.search('dc=dms,dc=local', f'(&(objectClass=user)(sAMAccountName={username})(!(UserAccountControl:1.2.840.113556.1.4.803:=2)))', attributes=['cn','mail','displayName'])
     member = conn.entries
 
     if len(member) == 0:
         raise NotAuthorizedException()
+
+    try:
+        server2 = Server(settings.AD_URL)
+        conn2 = Connection(server2, user=member[0].entry_dn, password=password)
+        conn2.bind()
+    except:
+        raise NotAuthorizedException()
+
 
     return {
         "username": username,
