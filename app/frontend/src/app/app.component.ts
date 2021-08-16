@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { User } from './models';
-import { DmsStorageApiService } from './services/dms-storage-api.service';
+import { AuthService } from './services/auth.service';
 
 
 @Component({
@@ -15,8 +15,13 @@ export class AppComponent {
 
   constructor(
     private router: Router,
-    private storageService: DmsStorageApiService
+    private authService: AuthService
   ) {
-    this.storageService.currentUser.subscribe( x => this.currentUser = x);
+    this.authService.currentUser.subscribe( x => this.currentUser = x);
+  }
+
+  logout(){
+    this.authService.logout();
+    this.router.navigate(['/']);
   }
 }

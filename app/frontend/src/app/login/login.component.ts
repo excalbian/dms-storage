@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
-import { DmsStorageApiService } from '../services/dms-storage-api.service';
+import { AuthService } from '../services/auth.service';
 import { AlertService } from '../services/alert.service';
 
 @Component({
@@ -21,11 +21,11 @@ export class LoginComponent implements OnInit {
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
-        private storageService: DmsStorageApiService,
+        private authService: AuthService,
         private alertService: AlertService
     ) {
         // redirect to home if already logged in
-        if (this.storageService.currentUserValue !== null) {
+        if (this.authService.currentUserValue !== null) {
             this.router.navigate(['/']);
         }
     }
@@ -47,7 +47,7 @@ export class LoginComponent implements OnInit {
         this.submitted = true;
 
         // reset alerts on submit
-        //this.alertService.clear();
+        this.alertService.clear();
 
         // stop here if form is invalid
         if (this.loginForm.invalid) {
@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit {
         }
 
         this.loading = true;
-        this.storageService.login(this.f.username.value, this.f.password.value)
+        this.authService.login(this.f.username.value, this.f.password.value)
             .pipe(first())
             .subscribe(
                 data => {

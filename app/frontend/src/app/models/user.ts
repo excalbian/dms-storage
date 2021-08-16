@@ -10,6 +10,6 @@ export class User {
   can_report: boolean = false;
   can_configure: boolean = false;
   can_ban: boolean = false;
-  next_use: Date = new Date('9999-12-31 23:59:59')
-
+  next_use: Date = new Date('9999-12-31 23:59:59');
+  exp: number = 0;
 }

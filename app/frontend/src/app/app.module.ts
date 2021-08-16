@@ -8,15 +8,17 @@ import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { MaterialModule } from './material.module';
+import { MaterialModule } from './helpers/material.module';
 
 import {FlexLayoutModule} from '@angular/flex-layout';
+import { AdminConsoleComponent } from './admin/admin-console/admin-console.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     HomeComponent,
+    AdminConsoleComponent,
   ],
   imports: [
     BrowserModule,
