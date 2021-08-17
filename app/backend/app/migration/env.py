@@ -14,7 +14,7 @@ basedir = os.path.abspath(os.path.dirname(app.__file__))
 config = context.config
 section = config.config_ini_section
 config.set_section_option(section, "sqlalchemy.url",  os.environ.get('DATABASE_URL') or \
-    'sqlite:///' + os.path.join(basedir, '../.data/app.db'))
+    'sqlite:///' + os.path.join(basedir, '../../../../.data/app.db'))
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)

@@ -7,11 +7,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LoginComponent } from './login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './home/home.component';
-import { HttpClientModule } from '@angular/common/http';
+
+import { HttpClientModule, HTTP_INTERCEPTORS  } from '@angular/common/http';
+import { ErrorInterceptor } from './helpers/error.interceptor';
+import { JwtInterceptor } from './helpers/jwt.interceptor';
+
 import { MaterialModule } from './helpers/material.module';
 
 import {FlexLayoutModule} from '@angular/flex-layout';
 import { AdminConsoleComponent } from './admin/admin-console/admin-console.component';
+
 
 @NgModule({
   declarations: [
@@ -30,7 +35,10 @@ import { AdminConsoleComponent } from './admin/admin-console/admin-console.compo
     MaterialModule,
     FlexLayoutModule,
   ],
-  providers: [],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

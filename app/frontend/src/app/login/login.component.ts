@@ -1,10 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroupDirective, NgForm, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
+import {ErrorStateMatcher} from '@angular/material/core';
+
 
 import { AuthService } from '../services/auth.service';
 import { AlertService } from '../services/alert.service';
+
+/** Error when invalid control is dirty, touched, or submitted. */
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
+
 
 @Component({
   templateUrl: 'login.component.html',
@@ -16,6 +27,8 @@ export class LoginComponent implements OnInit {
     loading = false;
     submitted = false;
     returnUrl!: string;
+
+    matcher = new MyErrorStateMatcher();
 
     constructor(
         private formBuilder: FormBuilder,

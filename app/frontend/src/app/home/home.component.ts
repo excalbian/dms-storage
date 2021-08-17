@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { first } from 'rxjs/operators';
 
 import { User } from '../models';
+import { noop } from 'rxjs';
 
 
 
@@ -20,6 +21,7 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit() {
+      noop();
     }
 
 }

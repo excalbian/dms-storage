@@ -6,15 +6,9 @@
         <span class="label">Login</span>
       </a>
       <a mat-list-item
-
          routerLink="/">
         <mat-icon class="icon">home</mat-icon>
         <span class="label">Home</span>
-      </a>
-      <a mat-list-item
-         routerLink="/dashboard">
-        <mat-icon class="icon">dashboard</mat-icon>
-        <span class="label">Dashboard</span>
       </a>
       <a mat-list-item
         (click)="logout()"
@@ -39,28 +33,23 @@
       <div fxFlex fxLayout fxLayoutAlign="flex-end"  fxHide.xs>
         <ul fxLayout fxLayoutGap="20px" class="navigation-items">
           <li>
-            <a routerLink="/login" >
-              <mat-icon class="icon">input</mat-icon>
-              <span  class="label">Login</span>
-            </a>
-          </li>
-          <li>
             <a routerLink="/">
               <mat-icon class="icon">home</mat-icon>
               <span class="label">Home</span>
             </a>
           </li>
-          <li>
-            <a
-              routerLink="/dashboard">
-              <mat-icon class="icon">dashboard</mat-icon>
-              <span class="label">Dashboard</span>
+          <li >
+            <a routerLink="/login" *ngIf="this.currentUser == null">
+              <mat-icon class="icon">input</mat-icon>
+              <span  class="label">Login</span>
             </a>
           </li>
+
           <li>
             <a
               type="button"
               (click)="logout()"
+              *ngIf="this.currentUser != null"
             >
               <mat-icon class="icon">input</mat-icon>
               <span class="label">LogOut</span>

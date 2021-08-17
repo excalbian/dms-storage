@@ -22,6 +22,7 @@ class AuditType(str, enum.Enum):
 class DbAuditLog(DbBase):
     """ Represents an audit entry in the database. Used for all
         actions that should be auditable """
+    __tablename__ = 'auditlog'
     id = Column(Integer, primary_key=True)
     logtime = Column(DateTime, default=datetime.now)
     logtype = Column(Enum(AuditType))

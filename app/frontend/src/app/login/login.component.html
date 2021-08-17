@@ -1,23 +1,48 @@
-<h2>Login</h2>
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" formControlName="username" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.username.errors }" />
-        <div *ngIf="submitted && f.username.errors" class="invalid-feedback">
-            <div *ngIf="f.username.errors.required">Username is required</div>
+<div fxLayout="row" fxLayoutAlign="center center" class="content">
+  <mat-card class="card" >
+    <mat-card-title fxLayout.gt-xs="row" fxLayout.xs="column">
+      Login
+    </mat-card-title>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <mat-card-content>
+      <div class="formrow">
+        <mat-icon>person</mat-icon>
+        <mat-form-field appearance="fill">
+
+          <mat-label>Username</mat-label>
+          <input
+            type="text"
+            formControlName="username"
+            matInput
+            required
+            [errorStateMatcher]="matcher"
+            />
+          <mat-hint>DMS Username</mat-hint>
+        </mat-form-field>
+      </div>
+      <div class="formrow">
+        <mat-icon>lock</mat-icon>
+          <mat-form-field appearance="fill">
+            <mat-label>Password</mat-label>
+            <input
+              type="password"
+              formControlName="password"
+              matInput
+              required
+            />
+          </mat-form-field>
         </div>
-    </div>
-    <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" formControlName="password" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.password.errors }" />
-        <div *ngIf="submitted && f.password.errors" class="invalid-feedback">
-            <div *ngIf="f.password.errors.required">Password is required</div>
-        </div>
-    </div>
-    <div class="form-group">
-        <button [disabled]="loading" class="btn btn-primary">
-            <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
-            Login
-        </button>
-    </div>
-</form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button
+        [disabled]="loading"
+        mat-raised-button
+        color="primary"
+      >
+        LOGIN
+      </button>
+    </mat-card-actions>
+  </form>
+  </mat-card>
+</div>
+

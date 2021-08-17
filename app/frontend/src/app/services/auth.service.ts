@@ -40,7 +40,7 @@ export class AuthService {
         localStorage.setItem('currentUser', JSON.stringify(decoded));
         this.currentUserSubject.next(decoded);
         return decoded;
-      }) // #TODO - Add Auth and Error Interceptors - https://stackoverflow.com/questions/46019771/catching-errors-in-angular-httpclient
+      })
       );
   }
 
@@ -52,6 +52,6 @@ export class AuthService {
   }
 
   isLoggedIn() : boolean {
-    return this.user != null && Date.now() >= this.user.exp * 1000;
+    return this.user != null && Date.now() < this.user.exp * 1000;
   }
 }

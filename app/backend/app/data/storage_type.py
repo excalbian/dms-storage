@@ -46,7 +46,7 @@ class StorageTypeAccess():
     def get_enabled(self) -> List[StorageType]:
         with self._session() as db:
             storage_types:List[DbStorageType] = db.query(DbStorageType) \
-                .filter_by(DbStorageType.enabled == True) \
+                .filter(DbStorageType.enabled == True) \
                 .order_by(DbStorageType.name) \
                 .all()
         

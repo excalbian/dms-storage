@@ -10,8 +10,9 @@ from app.core.settings import settings
 from app.data.user import UserAccess, User
 from app.core.security import create_access_token, ad_auth_user
 from app.core.database import SessionLocal
+from app.data.auditlog import AuditLogAccess, AuditLog, AuditType
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 #import logging
 
 router = APIRouter()
@@ -42,6 +43,7 @@ async def auth(
     
    
     user_access = UserAccess(SessionLocal)
+    audit_log_access = AuditLogAccess(SessionLocal)
     dbuser = user_access.get_user_by_username(user['username'])
     if dbuser is None:
         newuser = User(
@@ -49,8 +51,22 @@ async def auth(
             email = user['email'], 
             displayname = user['name'])
         dbuser = user_access.create_user(newuser)
+        audit_log_access.create( AuditLog(
+            logtime=datetime.now(),
+            logtype=AuditType.login,
+            message=f'New user {user["name"]} created.',
+            data=None,
+            user=dbuser
+        ))
         logger.info(f'Created new database user {dbuser.id} for {username}')
     logger.debug(f'User {username} logged in as {dbuser.id}')
+    audit_log_access.create( AuditLog(
+            logtime=datetime.now(),
+            logtype=AuditType.login,
+            message=f'',
+            data=None,
+            user=dbuser
+        ))
     access_token_expires = timedelta(minutes=int(settings.ACCESS_TOKEN_EXPIRE_MINUTES))
     return {
         "access_token": create_access_token(

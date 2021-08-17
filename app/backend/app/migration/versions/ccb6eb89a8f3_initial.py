@@ -7,6 +7,7 @@ Create Date: 2021-05-30 22:44:44.597615
 """
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.sql.expression import null
 
 
 # revision identifiers, used by Alembic.
@@ -38,6 +39,7 @@ def upgrade():
     sa.Column('name', sa.String(length=30), nullable=False),
     sa.Column('location', sa.String(length=30), nullable=True),
     sa.Column('valid_days', sa.Integer(), nullable=True),
+    sa.Column('enabled', sa.Boolean(), nullable=False, default=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -72,7 +74,7 @@ def upgrade():
     op.create_table('auditlog',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('logtime', sa.DateTime(), nullable=True),
-    sa.Column('type', sa.Enum('login', 'slotreserved', 'slotreleased', 'userupdated', 'reportrun', 'slotupdated', name='audittype'), nullable=True),
+    sa.Column('logtype', sa.Enum('login', 'slotreserved', 'slotreleased', 'userupdated', 'reportrun', 'slotupdated', name='audittype'), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('message', sa.Text(), nullable=True),
     sa.Column('data', sa.JSON(), nullable=True),
