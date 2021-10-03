@@ -4,7 +4,6 @@ from sqlalchemy.orm import sessionmaker
 import app.data.user as user
 from app.data import DbBase
 import pytest
-import datetime
 
 @pytest.fixture(scope="function")
 def engine()->Engine:

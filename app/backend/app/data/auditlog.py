@@ -5,6 +5,7 @@ from sqlalchemy.orm.session import sessionmaker
 from .user import DbUser, User
 from . import DbBase
 from sqlalchemy import Column, Integer, DateTime, Enum, ForeignKey, Text, JSON
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship, Session
 import enum
 from . import PydanticBase
@@ -18,6 +19,8 @@ class AuditType(str, enum.Enum):
     userupdated = 'userupdated'
     reportrun = 'reportrun'
     slotupdated = 'slotupdated'
+    security = 'security'
+    info = 'info'
 
 class DbAuditLog(DbBase):
     """ Represents an audit entry in the database. Used for all
@@ -35,9 +38,9 @@ class DbAuditLog(DbBase):
 class AuditLog(PydanticBase):
     id: int = Field(allow_mutation=False, default=-1)
     logtime: datetime = Field(allow_mutation=False, default=datetime.min)
-    logtype: AuditType
-    message: str
-    data: Optional[str] = None
+    logtype: AuditType = AuditType.info
+    message: str = ""
+    data: Optional[dict] = None
     user: User
 
 class AuditLogAccess():

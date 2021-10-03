@@ -5,11 +5,21 @@ Project for storage control at Dallas Makerspace
 - SQLAlchemy - Database ORM
 - Alembic - Database schema versioning
 - FastAPI - REST API
-- Authlib - OAuth2 integration (google)
+- Authlib - 
   
 ## Quickstart
 Quickest way to get going is to use the docker compose to bring up a couple of docker containers containing the database and the code. 
 
+docker compose up
+    frontend: http://localhost:4200
+    restapi: http://localhost:8080
+    phpldapadmin: http://localhost:8888
+    phpmyadmin: http://localhost:8081
+
+ldap login:  cn=admin,dc=dms,dc=local / Adm1n! 
+mysql login:  Not needed.  Otherwise root / example
+
+all user (user1, user2, user3, user4) passwords set to "password
 
 
 Generate new keys
@@ -20,7 +30,7 @@ cat jwtRS256.key
 cat jwtRS256.key.pub
 
 
-# UI / Endpoing functionality TODO
+# UI / Endpoint functionality TODO
 - auth/Login
 - storage/Allocate new Storage
 - storage/allocate new w/ quiz

@@ -13,7 +13,7 @@ from typing import Optional, List
 import enum
 
 class StorageStatus(str, enum.Enum):
-    """ All types of actions logged in the audit table """
+    """ All types of statuses """
     pending = 'pending'
     active = 'active'
     expired = 'expired'
@@ -23,6 +23,7 @@ class DbStorage(DbBase):
     """ Storage DB Model
         Represents a reservation of a storage slot. Main transactional table for the application
     """
+    __tablename__ = 'storage'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
     slot_id = Column(Integer, ForeignKey('storage_slot.id'), nullable=False)
@@ -53,6 +54,9 @@ class StorageAccess():
         self._session = sm
     
     def create_storage(self, storage:Storage) -> Storage:
+        if storage.user.is_banned or not storage.user.is_active:
+            raise UserCantReserve("User cannot reserve storage")
+
         with self._session() as db:
             reserved = db.query(DbStorage) \
                 .filter( 
@@ -60,14 +64,12 @@ class StorageAccess():
                     DbStorage.status != StorageStatus.closed
                 ) \
                 .all()
+
             if len(reserved) != 0:
                 raise SlotAlreadyInUse("Slot already in use")
             
             if not storage.slot.enabled:
                 raise SlotDisabled("Slot cannot be reserved")
-            
-            if storage.user.is_banned or not storage.user.is_active:
-                raise UserCantReserve("User cannot reserve storage")
 
             expiring = storage.expiring
             if expiring is None:
@@ -90,7 +92,7 @@ class StorageAccess():
     def get_storage_by_id(self, id: int) -> Storage:
         with self._session() as db:
             s = db.query(DbStorage).get(id)
-            return Storage.from_orm(s)
+            return None if s is None else  Storage.from_orm(s)
     
     def get_storage_by_user(self, user: User, only_active:bool = False) -> List[Storage]:
         with self._session() as db:

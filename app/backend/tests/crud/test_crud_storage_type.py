@@ -2,7 +2,7 @@
 from os import name
 import app.data.storage_type as storagetype
 from .fixtures import *
-from app.tests.utils.randoms import random_string
+from ..utils.randoms import random_string
 
 def test_crud_create_get(session):
     access = storagetype.StorageTypeAccess(session)

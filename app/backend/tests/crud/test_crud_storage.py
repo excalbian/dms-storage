@@ -7,7 +7,7 @@ import app.data.user as user
 from datetime import datetime, timedelta
 
 from .fixtures import *
-from app.tests.utils.randoms import random_string
+from ..utils.randoms import random_string
 
 def _type(session, name="Project Storage", location="South Workshop", days=7):
     typeaccess = storagetype.StorageTypeAccess(session)
@@ -54,8 +54,8 @@ def test_create_storage(session):
     assert created.user.id == testuser.id
     assert created.slot == testslot
     assert created.slot.id == testslot.id
-    assert created.expiring > datetime.datetime.now() + timedelta(hours=6*24 + 23.9)
-    assert created.expiring < datetime.datetime.now() + timedelta(days=7)
+    assert created.expiring > datetime.now() + timedelta(hours=6*24 + 23.9)
+    assert created.expiring < datetime.now() + timedelta(days=7)
 
 def test_get_storage(session):
     testtype = _type(session)
@@ -212,3 +212,9 @@ def test_bad_update(session):
     )
     with pytest.raises(KeyError):
         updated = storageaccess.update(s)
+
+def test_bad_get_by_id(session):
+    storageaccess = storage.StorageAccess(session)
+    results = storageaccess.get_storage_by_id(-1)
+
+    assert results is None

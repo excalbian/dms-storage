@@ -1,6 +1,6 @@
 import app.data.user as user
 from .fixtures import *
-from app.tests.utils.randoms import random_date, random_string
+from ..utils.randoms import random_string
 
 def test_crud_create(session):
     useraccess = user.UserAccess(session)

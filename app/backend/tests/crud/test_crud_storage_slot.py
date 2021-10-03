@@ -3,7 +3,7 @@ from os import name
 import app.data.storage_type as storagetype
 import app.data.storage_slot as storageslot
 from .fixtures import *
-from app.tests.utils.randoms import random_string
+from ..utils.randoms import random_string
 
 def test_crud_create_get(session):
     slotaccess = storageslot.StorageSlotAccess(session)

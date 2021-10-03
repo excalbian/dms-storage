@@ -105,3 +105,7 @@ class UserAccess():
             updated = db.query(DbUser).get(obj.id)
             return User.from_orm(updated)
     
+    def get_user_by_id(self, user_id: int):
+        with self._session() as db:
+            dbuser = db.query(DbUser).get(user_id)
+            return None if dbuser is None else User.from_orm(dbuser)

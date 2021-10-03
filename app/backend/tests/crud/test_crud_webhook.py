@@ -1,7 +1,7 @@
 
 import app.data.webhook as webhook
 from .fixtures import *
-from app.tests.utils.randoms import random_string
+from ..utils.randoms import random_string
 
 def test_crud_create_get(session):
     access = webhook.WebhookAccess(session)
