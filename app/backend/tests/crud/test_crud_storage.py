@@ -147,8 +147,8 @@ def test_get_storage_by_user(session):
             status = s
         ))
     
-    results = storageaccess.get_storage_by_user(users[0])
-    active_results = storageaccess.get_storage_by_user(users[1], only_active=True)
+    results = storageaccess.get_storage(users[0])
+    active_results = storageaccess.get_storage(users[1], only_active=True)
 
     assert len(results) == 50
     assert all(s.user == users[0] for s in results)

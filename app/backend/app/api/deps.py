@@ -38,3 +38,12 @@ def get_current_active_superuser(
     if not current_user or not current_user.is_admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     return current_user
+
+def get_current_active_configuser(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if current_user is None or (
+        current_user.is_admin != True 
+        and current_user.can_configure != True):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    return current_user

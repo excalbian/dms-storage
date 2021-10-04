@@ -1,4 +1,5 @@
 
+from typing import Optional
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
@@ -7,7 +8,7 @@ from pydantic.main import BaseModel
 from sqlalchemy.sql.sqltypes import Integer
 
 from starlette.requests import Request
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_409_CONFLICT
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND, HTTP_409_CONFLICT
 
 from app.api  import deps
 from app.core.settings import settings
@@ -19,7 +20,7 @@ from app.data.user import UserAccess, User
 from app.data.user import User
 from app.core.database import SessionLocal
 
-from datetime import timedelta
+from datetime import timedelta, datetime
 #import logging
 
 router = APIRouter()
@@ -108,3 +109,23 @@ async def allocate_storage(
     # return what was created
     return storage
 
+@router.get("/storage")
+async def get_storage(
+    userid: Optional[int] = None,
+    user:User = Depends(deps.get_current_active_user) 
+):
+
+    lookupuser:User = user
+    
+    # Switch to userid if applicable
+    if( userid is not None and user.id != userid ):
+        if( not user.is_admin):
+            raise HTTPException(detail="Cannot retrive other users", status_code=HTTP_403_FORBIDDEN)
+        else:
+            useraccess = UserAccess(SessionLocal)
+            lookupuser = useraccess.get_user_by_id(userid)
+            if( lookupuser is None):
+                raise HTTPException(detail="User not found", status_code=HTTP_404_NOT_FOUND)
+    
+    storage_access = StorageAccess(SessionLocal)
+    return storage_access.get_storage(user = lookupuser)
