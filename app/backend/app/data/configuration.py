@@ -1,22 +1,8 @@
 from datetime import datetime
 
 from sqlalchemy.orm.session import sessionmaker
-from . import DbBase
-from sqlalchemy import Column, Integer, String, Text
-from sqlalchemy.orm import relationship, Session
-from app.core.database import get_db
-from . import PydanticBase
-from pydantic import Field
-from typing import Optional
+from .dbmodels import DbConfiguration
 
-class DbConfiguration(DbBase):
-    """ Configuration DB class
-        Represents simple key/value configuration entries for the application. Meant
-        to be read once and cached.
-    """
-    id = Column(Integer, primary_key=True)
-    key = Column(String(25), index=True, unique=True)
-    value = Column(Text)
 
 # basic crud
 class ConfigurationAccess():

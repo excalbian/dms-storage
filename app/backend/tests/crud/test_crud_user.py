@@ -1,10 +1,12 @@
-import app.data.user as user
 from .fixtures import *
 from ..utils.randoms import random_string
 
+from app.data.dbmodels import User
+from app.data.user import UserAccess
+
 def test_crud_create(session):
-    useraccess = user.UserAccess(session)
-    testuser = user.User(
+    useraccess = UserAccess(session)
+    testuser = User(
             username = "testuser",
             displayname = "test user",
             email = "test@example.com",
@@ -26,8 +28,8 @@ def test_crud_create(session):
     assert result.is_banned == False
 
 def test_crud_get_by_username(session):
-    useraccess = user.UserAccess(session)
-    testuser = useraccess.create_user( user.User(
+    useraccess = UserAccess(session)
+    testuser = useraccess.create_user( User(
             username = "testuser",
             displayname = "test user",
             email = "test@example.com",
@@ -45,9 +47,9 @@ def test_crud_get_by_username(session):
     assert testuser == result
     
 def test_crud_get_users(session):
-    useraccess = user.UserAccess(session)
+    useraccess = UserAccess(session)
     for i in range(0,99):
-        useraccess.create_user( user.User(
+        useraccess.create_user( User(
             username = random_string(15),
             displayname = random_string(30),
             email = random_string(8) + "@example.com"
@@ -62,8 +64,8 @@ def test_crud_get_users(session):
     assert result_1[0] != result_2[0]
 
 def test_crud_update(session):
-    useraccess = user.UserAccess(session)
-    testuser = user.User(
+    useraccess = UserAccess(session)
+    testuser = User(
             username = random_string(15),
             displayname = random_string(30),
             email = random_string(8) + "@example.com"

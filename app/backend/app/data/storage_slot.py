@@ -1,33 +1,7 @@
-from datetime import datetime
-from ntpath import join
 from typing import List
-
-from pydantic.fields import Field
 from sqlalchemy.orm.session import sessionmaker
-from . import DbBase, PydanticBase
-from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, Boolean
-from .storage_type import StorageType, DbStorageType
-from sqlalchemy.orm import relationship
+from .dbmodels import DbStorageSlot, DbStorageType, StorageSlot, StorageType
 
-class DbStorageSlot(DbBase):
-    """ Storage Slot DB Model
-        Represents a single reserveable place for storage.
-    """
-    __tablename__ = 'storage_slot'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(30), nullable=False)
-    storage_type_id = Column(Integer, ForeignKey(DbStorageType.id))
-    enabled = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    storage_type = relationship(DbStorageType)
-
-# CRUD - basic crud, no delete
-class StorageSlot(PydanticBase):
-    id: int = Field(allow_mutation=False, default=-1)
-    name: str
-    enabled: bool = True
-    storage_type: StorageType
 
 #CRUD - basic crud, no delete
 class StorageSlotAccess():
@@ -40,13 +14,25 @@ class StorageSlotAccess():
                 .join(DbStorageType) \
                 .order_by(DbStorageType.name, DbStorageSlot.name) \
                 .all()
-            return [StorageSlot.from_orm(s) for s in slots]
-    
-    def get_all_of_type(self, storage_type: StorageType) -> List[StorageSlot]:
+            results:List[StorageSlot] = []
+            for s in slots:
+                ss = StorageSlot.from_orm(s)
+                ss.has_storage = s.storage is not None and len(s.storage) > 0
+                results.append(ss)
+            return results
+        
+    def get_all_of_type(
+        self, 
+        storage_type: StorageType,
+        enabled_only: bool = False) -> List[StorageSlot]:
         with self._session() as db:
-            slots:List[DbStorageSlot] = db.query(DbStorageSlot) \
+            q = db.query(DbStorageSlot) \
                 .join(DbStorageType) \
-                .filter(DbStorageSlot.storage_type_id == storage_type.id) \
+                .filter(DbStorageSlot.storage_type_id == storage_type.id)
+            if enabled_only:
+                q = q.filter(DbStorageSlot.enabled == True)
+
+            slots:List[DbStorageSlot] = q \
                 .order_by(DbStorageType.name, DbStorageSlot.name) \
                 .all()
             return [StorageSlot.from_orm(s) for s in slots]

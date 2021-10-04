@@ -10,12 +10,12 @@ from starlette.status import HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_
 
 from app.api  import deps
 from app.core.settings import settings
+from app.data.dbmodels import User
 from app.data.storage_slot import StorageSlot, StorageSlotAccess
 from app.data.storage_type import StorageTypeAccess
-from app.data.user import User
 from app.core.database import SessionLocal
 
-from datetime import timedelta
+
 #import logging
 
 router = APIRouter()

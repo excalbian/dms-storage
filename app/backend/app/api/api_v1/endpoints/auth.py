@@ -7,10 +7,12 @@ from starlette.requests import Request
 
 from app.api  import deps
 from app.core.settings import settings
-from app.data.user import UserAccess, User
+from app.data.dbmodels import AuditLog, AuditType, User
+from app.data.user import UserAccess
+from app.data.auditlog import AuditLogAccess
 from app.core.security import create_access_token, ad_auth_user
 from app.core.database import SessionLocal
-from app.data.auditlog import AuditLogAccess, AuditLog, AuditType
+
 
 from datetime import timedelta, datetime
 #import logging

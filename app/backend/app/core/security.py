@@ -1,5 +1,5 @@
 from typing import Union, Any
-from app.data.user import User
+from app.data.dbmodels import User
 from datetime import timedelta, datetime
 from app.core.settings import settings
 from authlib.jose import jwt

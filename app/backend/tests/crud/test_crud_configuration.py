@@ -1,11 +1,10 @@
 
-import app.data.configuration as configuration
-import datetime
+from app.data.configuration import ConfigurationAccess
 from .fixtures import *
 from ..utils.randoms import random_string
 
 def test_crud_create_get(session):
-    configaccess = configuration.ConfigurationAccess(session)
+    configaccess = ConfigurationAccess(session)
     configaccess.create("testkey","testval")
     for i in range(0,999):
         configaccess.create(random_string(10),random_string(100))
@@ -18,7 +17,7 @@ def test_crud_create_get(session):
     assert "testkey" in all_values
 
 def test_crud_update(session):
-    configaccess = configuration.ConfigurationAccess(session)
+    configaccess = ConfigurationAccess(session)
     configaccess.create("testkey","testval")
     configaccess.create("testkey2","nonsense")
 
@@ -28,7 +27,7 @@ def test_crud_update(session):
     assert configaccess.get("testkey") == "anotherval"
 
 def test_crud_delete(session):
-    configaccess = configuration.ConfigurationAccess(session)
+    configaccess = ConfigurationAccess(session)
     configaccess.create("testkey","testval")
     configaccess.create("testkey2","nonsense")
 
@@ -38,13 +37,13 @@ def test_crud_delete(session):
     assert configaccess.get("testkey") is None
 
 def test_crud_bad_delete(session):
-    configaccess = configuration.ConfigurationAccess(session)
+    configaccess = ConfigurationAccess(session)
     configaccess.create("testkey","testval")
     with pytest.raises(KeyError):
         configaccess.delete("badkey")
 
 def test_crud_bad_update(session):
-    configaccess = configuration.ConfigurationAccess(session)
+    configaccess = ConfigurationAccess(session)
     configaccess.create("testkey","testval")
     with pytest.raises(KeyError):
         configaccess.update("badkey", "value")

@@ -1,54 +1,17 @@
 from datetime import datetime, timedelta
 from sqlalchemy.orm.session import sessionmaker
 
-from sqlalchemy.sql.expression import null
-from sqlalchemy.sql.sqltypes import Enum
-from . import DbBase, PydanticBase
-from .user import DbUser, User
-from .storage_slot import DbStorageSlot, StorageSlot
-from sqlalchemy import Column, Integer, ForeignKey, DateTime
-from sqlalchemy.orm import relationship, Session
-from pydantic import BaseModel, Field
+
 from typing import Optional, List
-import enum
+from .dbmodels import DbStorage, Storage, StorageStatus, User
 
-class StorageStatus(str, enum.Enum):
-    """ All types of statuses """
-    pending = 'pending'
-    active = 'active'
-    expired = 'expired'
-    closed = 'closed'
 
-class DbStorage(DbBase):
-    """ Storage DB Model
-        Represents a reservation of a storage slot. Main transactional table for the application
-    """
-    __tablename__ = 'storage'
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'), nullable=False, index=True)
-    slot_id = Column(Integer, ForeignKey('storage_slot.id'), nullable=False)
-    started = Column(DateTime, default=datetime.now, nullable=False)
-    status = Column(Enum(StorageStatus), default=StorageStatus.pending,  nullable=False)
-    expiring = Column(DateTime, nullable=True, index=True)
-    ended = Column(DateTime, nullable=True)
-    updated = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    slot = relationship(DbStorageSlot.__name__)
-    user = relationship(DbUser.__name__, backref='storage')
 
 # CRUD
 # Should do:
 # Prevent single slot from having multiple entires (slot_id/)
 # Do basic reporting by user, by area, by slot, expiring, expired, etc
 # 
-class Storage(PydanticBase):
-    id: int = Field(allow_mutation=False, default=-1)
-    started: Optional[datetime]
-    status: Optional[StorageStatus]
-    expiring: Optional[datetime]
-    ended: Optional[datetime]
-    slot: StorageSlot
-    user: User
-
 class StorageAccess():
     def __init__(self, sm:sessionmaker):
         self._session = sm
@@ -94,15 +57,28 @@ class StorageAccess():
             s = db.query(DbStorage).get(id)
             return None if s is None else  Storage.from_orm(s)
     
-    def get_storage_by_user(self, user: User, only_active:bool = False) -> List[Storage]:
+    def get_storage(
+        self, 
+        user: User = None, 
+        only_active:bool = False,
+        datefrom:Optional[datetime] = None,
+        dateto:Optional[datetime] = None,
+        limit:int = 100 ) -> List[Storage]:
         with self._session() as db:
-            q = db.query(DbStorage) \
-                .filter(DbStorage.user_id == user.id)
+            q = db.query(DbStorage)
+
+            if user is not None:
+                q = q.filter(DbStorage.user_id == user.id)
                 
             if only_active:
                 q = q.filter(DbStorage.status != StorageStatus.closed)
+            
+            if datefrom is not None:
+                q = q.filter(DbStorage.started > datefrom)
+            if dateto is not None:
+                q = q.filter(DbStorage.started < dateto)
 
-            q.order_by(DbStorage.started.desc())
+            q = q.order_by(DbStorage.started.desc()).limit(limit)
             return [Storage.from_orm(s) for s in q.all()]
     
     def get_all_active(self) -> List[Storage]:

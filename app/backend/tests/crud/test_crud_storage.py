@@ -1,17 +1,18 @@
 
 from os import name
-import app.data.storage_type as storagetype
-import app.data.storage_slot as storageslot
-import app.data.storage as storage
-import app.data.user as user
+from app.data.dbmodels import Storage, StorageStatus, StorageType, StorageSlot, User
+from app.data.storage_type import StorageTypeAccess
+from app.data.storage_slot import StorageSlotAccess
+from app.data.user import UserAccess
+from app.data.storage import StorageAccess, UserCantReserve, SlotAlreadyInUse, SlotDisabled
 from datetime import datetime, timedelta
 
 from .fixtures import *
 from ..utils.randoms import random_string
 
 def _type(session, name="Project Storage", location="South Workshop", days=7):
-    typeaccess = storagetype.StorageTypeAccess(session)
-    test_st = storagetype.StorageType(
+    typeaccess = StorageTypeAccess(session)
+    test_st = StorageType(
         name = name,
         location = location,
         valid_days = days
@@ -19,15 +20,15 @@ def _type(session, name="Project Storage", location="South Workshop", days=7):
     return typeaccess.create(test_st)
 
 def _slot(session, slottype, name="A-1"):
-    slotaccess = storageslot.StorageSlotAccess(session)
-    test_slot = storageslot.StorageSlot(
+    slotaccess = StorageSlotAccess(session)
+    test_slot = StorageSlot(
         name = name,
         storage_type = slottype
     )
     return slotaccess.create(test_slot)
 def _user(session, username="testuser"):
-    useraccess = user.UserAccess(session)
-    u = user.User(
+    useraccess = UserAccess(session)
+    u = User(
             username = username,
             displayname = "test user",
             email = "test@example.com",
@@ -42,8 +43,8 @@ def test_create_storage(session):
     testslot = _slot(session,testtype)
     testuser = _user(session)
 
-    storageaccess = storage.StorageAccess(session)
-    s = storage.Storage(
+    storageaccess = StorageAccess(session)
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
@@ -62,8 +63,8 @@ def test_get_storage(session):
     testslot = _slot(session,testtype)
     testuser = _user(session)
 
-    storageaccess = storage.StorageAccess(session)
-    s = storage.Storage(
+    storageaccess = StorageAccess(session)
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
@@ -80,19 +81,19 @@ def test_user_cant_reserve(session):
     testuser.is_banned = True
     useraccess.update_user(testuser)
 
-    storageaccess = storage.StorageAccess(session)
-    s = storage.Storage(
+    storageaccess = StorageAccess(session)
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
-    with pytest.raises(storage.UserCantReserve):
+    with pytest.raises(UserCantReserve):
         created = storageaccess.create_storage(s)
 
     testuser.is_banned = False
     testuser.is_active = False
     useraccess.update_user(testuser)
     s.user = testuser
-    with pytest.raises(storage.UserCantReserve):
+    with pytest.raises(UserCantReserve):
         created = storageaccess.create_storage(s)
 
 def test_slot_in_use(session):
@@ -101,47 +102,47 @@ def test_slot_in_use(session):
     testuser = _user(session)
     testuser2 = _user(session, username="testuser2")
 
-    storageaccess = storage.StorageAccess(session)
+    storageaccess = StorageAccess(session)
 
-    s = storage.Storage(
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
     created = storageaccess.create_storage(s)
 
-    s = storage.Storage(
+    s = Storage(
         user = testuser2,
         slot = testslot
     )
-    with pytest.raises(storage.SlotAlreadyInUse):
+    with pytest.raises(SlotAlreadyInUse):
         created = storageaccess.create_storage(s)
 
 def test_slot_disabled(session):
     testtype = _type(session)
     testslot = _slot(session,testtype)
     testuser = _user(session)
-    slotaccess = storageslot.StorageSlotAccess(session)
+    slotaccess = StorageSlotAccess(session)
     testslot.enabled = False
     slotaccess.update(testslot)
 
-    storageaccess = storage.StorageAccess(session)
+    storageaccess = StorageAccess(session)
 
-    s = storage.Storage(
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
-    with pytest.raises(storage.SlotDisabled):
+    with pytest.raises(SlotDisabled):
         created = storageaccess.create_storage(s)
 
 def test_get_storage_by_user(session):
     testtype = _type(session)
     users = [ _user(session), _user(session, username="username2") ]
 
-    storageaccess = storage.StorageAccess(session)
+    storageaccess = StorageAccess(session)
 
     for i in range(0,100):
-        s = (storage.StorageStatus.active if i % 5 == 0 else storage.StorageStatus.closed)
-        storageaccess.create_storage( storage.Storage(
+        s = (StorageStatus.active if i % 5 == 0 else StorageStatus.closed)
+        storageaccess.create_storage( Storage(
             user = users[i%2],
             slot = _slot(session, testtype, name=random_string(10)),
             status = s
@@ -155,23 +156,23 @@ def test_get_storage_by_user(session):
 
     assert len(active_results) == 10
     assert all(s.user == users[1] for s in active_results)
-    assert all(s.status == storage.StorageStatus.active for s in active_results)
+    assert all(s.status == StorageStatus.active for s in active_results)
 
 
 def test_get_all_active(session):
     testtype = _type(session)
     user = _user(session)
     statuses = [
-        storage.StorageStatus.active, 
-        storage.StorageStatus.expired,
-        storage.StorageStatus.closed,
-        storage.StorageStatus.pending
+        StorageStatus.active, 
+        StorageStatus.expired,
+        StorageStatus.closed,
+        StorageStatus.pending
     ]
-    storageaccess = storage.StorageAccess(session)
+    storageaccess = StorageAccess(session)
 
     for i in range(0,100):
    
-        storageaccess.create_storage( storage.Storage(
+        storageaccess.create_storage( Storage(
             user = user,
             slot = _slot(session, testtype, name=random_string(10)),
             status = statuses[i%4]
@@ -180,20 +181,20 @@ def test_get_all_active(session):
     results = storageaccess.get_all_active()
 
     assert len(results) == 75
-    assert all(s.status != storage.StorageStatus.closed for s in results)
+    assert all(s.status != StorageStatus.closed for s in results)
 
 def test_update(session):
     testtype = _type(session)
     testslot = _slot(session,testtype)
     testuser = _user(session)
 
-    storageaccess = storage.StorageAccess(session)
-    s = storage.Storage(
+    storageaccess = StorageAccess(session)
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
     created = storageaccess.create_storage(s)
-    created.status = storage.StorageStatus.closed
+    created.status = StorageStatus.closed
     updated = storageaccess.update(created)
 
     assert created == updated
@@ -205,8 +206,8 @@ def test_bad_update(session):
     testslot = _slot(session,testtype)
     testuser = _user(session)
 
-    storageaccess = storage.StorageAccess(session)
-    s = storage.Storage(
+    storageaccess = StorageAccess(session)
+    s = Storage(
         user = testuser,
         slot = testslot 
     )
@@ -214,7 +215,7 @@ def test_bad_update(session):
         updated = storageaccess.update(s)
 
 def test_bad_get_by_id(session):
-    storageaccess = storage.StorageAccess(session)
+    storageaccess = StorageAccess(session)
     results = storageaccess.get_storage_by_id(-1)
 
     assert results is None

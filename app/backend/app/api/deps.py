@@ -3,12 +3,9 @@ from typing import Generator
 from fastapi.security.oauth2 import OAuth2PasswordBearer
 from app.api.api_v1.endpoints.auth import router
 
-from sqlalchemy.orm.session import sessionmaker
-from app.core.database import get_db
-from app.data.user import User
+from app.data.dbmodels import User
 from app.core.security import get_user_from_token
-from authlib.jose import jwt
-from .token import Token 
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth")
 

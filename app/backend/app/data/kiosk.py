@@ -1,33 +1,6 @@
-from datetime import datetime
-from typing import Optional
-from pydantic.fields import Field
-
 from sqlalchemy.orm.session import sessionmaker
-from . import DbBase
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import relationship, Session
-from pydantic import BaseModel
+from .dbmodels import Kiosk, DbKiosk
 from typing import List
-from . import PydanticBase
-
-
-class DbKiosk(DbBase):
-    """ Kiosk DB Model
-        Meant to represent an address or machine name of a kiosk, to 
-        automatically put it in a kiosk mode. The printer name will
-        be used to connect and print out tags when necessary.
-    """
-    __tablename__ = 'kiosk'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(100))
-    printer_name = Column(String(100))
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
-class Kiosk(PydanticBase):
-    id: int = Field(allow_mutation=False, default=-1)
-    name: str
-    printer_name: Optional[str] = None
 
 # basic crud
 class KioskAccess():

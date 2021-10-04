@@ -1,35 +1,10 @@
-from datetime import datetime
 from typing import List
 
-from pydantic.fields import Field
 from sqlalchemy.orm.session import sessionmaker
-from . import DbBase, PydanticBase
-from sqlalchemy import Column, Integer, Enum, String, DateTime
-import enum
+from .dbmodels import DbWebhook, HookType, Webhook
 
-class HookType(str, enum.Enum):
-    """ Types of webhooks available """
-    slot_reserved = 'slot_reserved'
-    slot_expired = 'slot_expired'
-    slot_released = 'slot_released'
-    slot_dead = 'slot_dead'
-    user_banned = 'user_banned'
 
-class DbWebhook(DbBase):
-    """ Webhook DB Model
-        Stores registered webhooks to fire when actions happen
-    """
-    id = Column(Integer, primary_key=True)
-    hooktype = Column(Enum(HookType), index=True)
-    url = Column(String(200))
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    # TODO: Authentication / Key storage
 
-class Webhook(PydanticBase):
-    id: int = Field(allow_mutation=False, default=-1)
-    hooktype: HookType
-    url: str
 
 # CRUD - basic
 class WebhookAccess():

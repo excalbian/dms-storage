@@ -1,12 +1,13 @@
 
 from os import name
-import app.data.storage_type as storagetype
+from app.data.storage_type import StorageTypeAccess
+from app.data.dbmodels import StorageType
 from .fixtures import *
 from ..utils.randoms import random_string
 
 def test_crud_create_get(session):
-    access = storagetype.StorageTypeAccess(session)
-    test_st = storagetype.StorageType(
+    access = StorageTypeAccess(session)
+    test_st = StorageType(
         name = "storagetype",
         location = "dms",
         valid_days = 7
@@ -21,8 +22,8 @@ def test_crud_create_get(session):
     assert True == retrieved_st.enabled
 
 def test_crud_get_by_name(session):
-    access = storagetype.StorageTypeAccess(session)
-    test_st = storagetype.StorageType(
+    access = StorageTypeAccess(session)
+    test_st = StorageType(
         name = "storagetype",
         location = "dms",
         valid_days = 7
@@ -33,8 +34,8 @@ def test_crud_get_by_name(session):
     assert created_st == retrieved_st
 
 def test_crud_get_all(session):
-    access = storagetype.StorageTypeAccess(session)
-    test_st = storagetype.StorageType(
+    access = StorageTypeAccess(session)
+    test_st = StorageType(
         name = "storagetype",
         location = "dms",
         valid_days = 7
@@ -42,7 +43,7 @@ def test_crud_get_all(session):
     created_st = access.create(test_st)
 
     for i in range(0,99):
-        access.create(storagetype.StorageType(
+        access.create(StorageType(
             name = random_string(25),
             location = random_string(20),
             valid_days = 30
@@ -52,8 +53,8 @@ def test_crud_get_all(session):
     assert created_st == next((x for x in all_types if x.id == created_st.id), None)
 
 def test_crud_update(session):
-    access = storagetype.StorageTypeAccess(session)
-    test_st = storagetype.StorageType(
+    access = StorageTypeAccess(session)
+    test_st = StorageType(
         name = "storagetype",
         location = "dms",
         valid_days = 7
@@ -67,8 +68,8 @@ def test_crud_update(session):
 
 
 def test_crud_bad_update(session):
-    access = storagetype.StorageTypeAccess(session)
-    test_st = storagetype.StorageType(
+    access = StorageTypeAccess(session)
+    test_st = StorageType(
         name = "storagetype",
         location = "dms",
         valid_days = 7

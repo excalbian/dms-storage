@@ -1,50 +1,7 @@
-from datetime import datetime
-from typing import Optional, List
+from typing import List
 
 from sqlalchemy.orm.session import sessionmaker
-from . import DbBase
-from app.core.database import get_db
-from sqlalchemy import Column, Boolean, Integer, DateTime, String
-from sqlalchemy.orm import relationship
-from . import PydanticBase
-from pydantic import Field
-
-class DbUser(DbBase):
-    """ User DB Model
-        While not the authoritative source for login, as we'll use OAuth for that,
-        this model storage basic information about those users for use with this
-        system.
-    """
-    __tablename__ = 'user'
-    id = Column(Integer, primary_key=True)
-    username = Column(String(50), index=True, unique=True)
-    displayname = Column(String(100))
-    phone = Column(String(20), nullable=True)
-    email = Column(String(150), nullable=True)
-    next_use = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-    is_active = Column(Boolean, default=True)
-    is_banned = Column(Boolean, default=False)
-    is_admin = Column(Boolean, default=False)
-    can_report = Column(Boolean, default=False)
-    can_configure = Column(Boolean, default=False)
-    can_ban = Column(Boolean, default=False)
-
-
-class User(PydanticBase):
-    id: int = Field(allow_mutation=False, default=-1)
-    username: str
-    displayname: Optional[str] = None
-    phone: Optional[str] = None
-    email: str
-    is_active: bool = True
-    is_banned: bool = False
-    is_admin: bool = False
-    can_report: bool = False
-    can_configure: bool = False
-    can_ban: bool = False
-    next_use: Optional[datetime] = None
+from .dbmodels import DbUser, User
 
 class UserAccess():
     def __init__(self, sm:sessionmaker):

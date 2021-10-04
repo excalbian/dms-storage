@@ -8,11 +8,10 @@ from starlette.status import HTTP_404_NOT_FOUND
 
 from app.api  import deps
 from app.core.settings import settings
-from app.data.storage_type import StorageTypeAccess, StorageType
+from app.data.storage_type import StorageTypeAccess
 from app.data.user import User
 from app.core.database import SessionLocal
 
-from datetime import timedelta
 #import logging
 
 router = APIRouter()

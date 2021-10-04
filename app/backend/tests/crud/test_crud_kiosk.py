@@ -1,11 +1,12 @@
-
-import app.data.kiosk as kiosk
 from .fixtures import *
 from ..utils.randoms import random_string
 
+from app.data.dbmodels import Kiosk
+from app.data.kiosk import KioskAccess
+
 def test_crud_create_get(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )
@@ -19,15 +20,15 @@ def test_crud_create_get(session):
     assert retrievedkiosk.printer_name == testkiosk.printer_name
 
 def test_crud_get_by_name(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )
     createdkiosk = access.create(testkiosk)
 
     for i in range(0,99):
-        access.create(kiosk.Kiosk(
+        access.create(Kiosk(
             name = random_string(50),
             printer_name = random_string(75)
         ))
@@ -38,15 +39,15 @@ def test_crud_get_by_name(session):
     assert createdkiosk == retrievedkiosk
 
 def test_crud_get_all(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )
     createdkiosk = access.create(testkiosk)
 
     for i in range(0,99):
-        access.create(kiosk.Kiosk(
+        access.create(Kiosk(
             name = random_string(50),
             printer_name = random_string(75)
         ))
@@ -55,8 +56,8 @@ def test_crud_get_all(session):
     assert createdkiosk == next((x for x in kiosks if x.id == createdkiosk.id), None)
 
 def test_crud_update(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )
@@ -68,8 +69,8 @@ def test_crud_update(session):
     assert updatedkiosk.name == "newname"
 
 def test_crud_delete(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )
@@ -80,8 +81,8 @@ def test_crud_delete(session):
     assert result is None
 
 def test_crud_bad_update(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )
@@ -90,8 +91,8 @@ def test_crud_bad_update(session):
         access.update(testkiosk)
     
 def test_crud_bad_delete(session):
-    access = kiosk.KioskAccess(session)
-    testkiosk = kiosk.Kiosk(
+    access = KioskAccess(session)
+    testkiosk = Kiosk(
         name = "kiosk",
         printer_name = "print01"
     )

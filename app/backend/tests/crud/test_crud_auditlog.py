@@ -1,35 +1,38 @@
 
-import app.data.auditlog as auditlog
 import datetime
 from .fixtures import *
 from ..utils.randoms import random_string
 
+from app.data.dbmodels import User, AuditLog, AuditType, DbAuditLog
+from app.data.auditlog import AuditLogAccess
+from app.data.user import UserAccess
+
 def test_crud_create(session):
-    useraccess = user.UserAccess(session)
+    useraccess = UserAccess(session)
     testuser = useraccess.create_user( 
-        user.User(
+        User(
             username = "testuser",
             email = "test@example.com"
         )
     )
-    access = auditlog.AuditLogAccess(session)
+    access = AuditLogAccess(session)
     tm = datetime.datetime(2020,1,1,0,0,0)
-    new_auditlog = auditlog.AuditLog(
+    new_auditlog = AuditLog(
         user = testuser,
         logtime = tm,
-        logtype = auditlog.AuditType.login,
+        logtype = AuditType.login,
         message = "TEST"
     )
     created = access.create(new_auditlog)
 
     assert created.logtime != tm    # Should take the write time, not the time passed in
     assert created.user.id == testuser.id
-    assert created.logtype == auditlog.AuditType.login
+    assert created.logtype == AuditType.login
     assert created.message == "TEST"
 
 def test_crud_byuser(session):
     useraccess = user.UserAccess(session)
-    access = auditlog.AuditLogAccess(session)
+    access = AuditLogAccess(session)
 
     data = [
         (useraccess.create_user( 
@@ -46,14 +49,14 @@ def test_crud_byuser(session):
 
 
     for u, log in data:
-        log.append( access.create(auditlog.AuditLog(
+        log.append( access.create(AuditLog(
             user = u,
-            logtype = auditlog.AuditType.reportrun,
+            logtype = AuditType.reportrun,
             message = random_string(20)
         )))
-        log.append( access.create(auditlog.AuditLog(
+        log.append( access.create(AuditLog(
             user = u,
-            logtype = auditlog.AuditType.login,
+            logtype = AuditType.login,
             message = random_string(20)
         )))
 
@@ -67,7 +70,7 @@ def test_crud_byuser(session):
 
 def test_paging(session):
     useraccess = user.UserAccess(session)
-    access = auditlog.AuditLogAccess(session)
+    access = AuditLogAccess(session)
 
     testuser = useraccess.create_user( 
             user.User(
@@ -76,9 +79,9 @@ def test_paging(session):
         )
 
     for i in range(1,99):
-        access.create(auditlog.AuditLog(
+        access.create(AuditLog(
             user = testuser,
-            logtype = auditlog.AuditType.reportrun,
+            logtype = AuditType.reportrun,
             message = random_string(20)
         ))
 
@@ -95,11 +98,11 @@ def test_paging(session):
 
 def test_by_date(session):
     useraccess = user.UserAccess(session)
-    access = auditlog.AuditLogAccess(session)
+    access = AuditLogAccess(session)
 
     #clear audit log
     with session() as db:
-         db.query(auditlog.DbAuditLog).delete()
+         db.query(DbAuditLog).delete()
          db.commit()
     
     testuser = useraccess.create_user( 
@@ -111,8 +114,8 @@ def test_by_date(session):
     with session() as db:
         for i in range(0,100):
         
-            db.add(auditlog.DbAuditLog( 
-                    logtype = auditlog.AuditType.slotupdated,
+            db.add(DbAuditLog( 
+                    logtype = AuditType.slotupdated,
                     logtime = datetime.datetime(2020,1,1,0,0,0) + datetime.timedelta(days=i),
                     user_id = testuser.id,
                     message = random_string(20),

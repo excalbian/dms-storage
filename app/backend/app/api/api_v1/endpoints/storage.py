@@ -12,15 +12,13 @@ from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_4
 
 from app.api  import deps
 from app.core.settings import settings
+from app.data.dbmodels import AuditLog, AuditType, User
 from app.data.storage import SlotAlreadyInUse, SlotDisabled, StorageAccess, Storage, StorageStatus, UserCantReserve
-from app.data.storage_slot import StorageSlot, StorageSlotAccess
-from app.data.auditlog import AuditLogAccess, AuditLog, AuditType
+from app.data.storage_slot import StorageSlotAccess
+from app.data.auditlog import AuditLogAccess
+from app.data.user import UserAccess
 
-from app.data.user import UserAccess, User
-from app.data.user import User
 from app.core.database import SessionLocal
-
-from datetime import timedelta, datetime
 #import logging
 
 router = APIRouter()
