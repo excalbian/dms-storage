@@ -1,7 +1,7 @@
 version: '3'
 services: 
     api:
-        build: app/backend/.
+        build: ./app/backend/.
         ports:
         - "8080:8000"
         volumes:
@@ -29,7 +29,8 @@ services:
             MYSQL_USER: 'user'
             MYSQL_PASSWORD: 'password'
         volumes:
-            - ./.data:/var/lib/mysql
+            - ./.data:/var/lib/mysql:rw
+        user: mysql
             #- SYS_NICE  # CAP_SYS_NICE
         ports:
         - "6666:3306"
