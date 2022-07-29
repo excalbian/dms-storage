@@ -1,5 +1,5 @@
 # dms-storage
-Project for storage control at Dallas Makerspace
+Project for storage spage control at Dallas Makerspace
 
 ## Libraries Used
 - SQLAlchemy - Database ORM
@@ -30,6 +30,11 @@ cat jwtRS256.key
 cat jwtRS256.key.pub
 
 
+# Architechture
+backend - database (Postgresql) backend and API
+frontend - React UI
+kiosk - Raspberry Pi based UI and backend designed to act as a kiosk with receipt printer and RFID reader
+
 # UI / Endpoint functionality TODO
 - auth/Login
 - storage/Allocate new Storage
@@ -48,3 +53,6 @@ cat jwtRS256.key.pub
 - kiosk/badge-in
 - kiosk/storage
 - 
+
+# Notes
+Build using cookiecutter and [Buuntu/fastapi-react](https://github.com/Buuntu/fastapi-react)

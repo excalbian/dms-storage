@@ -1,3 +1,0 @@
-[submodule "dms-ad-openldap"]
-	path = dms-ad-openldap
-	url = https://github.com/Dallas-Makerspace/dms-ad-openldap.git

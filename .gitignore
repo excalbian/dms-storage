@@ -1,6 +1,7 @@
 .data
 .vscode
 .logs
+.local
 __pycache__
 .env
 id_rsa*
